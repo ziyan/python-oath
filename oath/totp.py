@@ -48,9 +48,9 @@ def totp(key, format='dec6', period=30, t=None, hash=hashlib.sha1):
        :type: str
     '''
     if t is None:
-        t = time.time()
+        t = int(time.time())
     if not isinstance(t, int):
-        raise ValueError('Use time.time()')
+        raise ValueError('Use int(time.time())')
     T = int(t / period)
     return hotp(key, T, format=format, hash=hash)
 
@@ -115,6 +115,7 @@ def accept_totp(key, response, format='dec6', period=30, t=None, hash=hashlib.sh
            reliable source of time like an NTP server.
        :rtype: a two element tuple
     '''
+    t = t or int(time.time())
     for i in range(max(-divmod(t, period)[0], -backward_drift), forward_drift + 1):
         d = (drift + i) * period
         if totp(key, format=format, period=period, hash=hash, t=t + d) == str(response):
