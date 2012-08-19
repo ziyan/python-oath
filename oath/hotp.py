@@ -91,8 +91,7 @@ def hotp(key,counter,format='dec6',hash=hashlib.sha1):
     else:
         raise ValueError('unknown format')
 
-def accept_hotp(key, response, counter, format='dec6', hash=hashlib.sha1,
-        drift=3, backward_drift=0):
+def accept_hotp(key, response, counter, format='dec6', hash=hashlib.sha1, drift=3, backward_drift=0):
     '''
        Validate a HOTP value inside a window of
        [counter-backward_drift:counter+forward_drift]
@@ -152,7 +151,7 @@ def accept_hotp(key, response, counter, format='dec6', hash=hashlib.sha1,
            (True, 4)
     '''
 
-    for i in range(-backward_drift, drift+1):
-        if hotp(key, counter+i, format=format, hash=hash) == str(response):
-            return True, counter+i+1
-    return False,counter
+    for i in range(-backward_drift, drift + 1):
+        if hotp(key, counter + i, format=format, hash=hash) == str(response):
+            return True, counter + i + 1
+    return False, counter

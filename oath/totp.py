@@ -1,7 +1,6 @@
 import time
 import hashlib
 import datetime
-import calendar
 
 '''
 :mod:`totp` -- RFC6238 - OATH TOTP implementation
@@ -50,16 +49,12 @@ def totp(key, format='dec6', period=30, t=None, hash=hashlib.sha1):
     '''
     if t is None:
         t = time.time()
-    else:
-        if isinstance(t, datetime.datetime):
-            t = calendar.timegm(t.utctimetuple())
-        else:
-            t = int(t)
-    T = int(t/period)
+    if not isinstance(t, int):
+        raise ValueError('Use time.time()')
+    T = int(t / period)
     return hotp(key, T, format=format, hash=hash)
 
-def accept_totp(key, response, format='dec6', period=30, t=None,
-        hash=hashlib.sha1, forward_drift=1, backward_drift=1, drift=0):
+def accept_totp(key, response, format='dec6', period=30, t=None, hash=hashlib.sha1, forward_drift=1, backward_drift=1, drift=0):
     '''
        Validate a TOTP value inside a window of 
        [drift-bacward_drift:drift+forward_drift] of time steps.
@@ -120,8 +115,8 @@ def accept_totp(key, response, format='dec6', period=30, t=None,
            reliable source of time like an NTP server.
        :rtype: a two element tuple
     '''
-    for i in range(max(-divmod(t, period)[0],-backward_drift),forward_drift+1):
-        d = (drift+i) * period
-        if totp(key, format=format, period=period, hash=hash, t=t+d) == str(response):
-            return True, drift+i
+    for i in range(max(-divmod(t, period)[0], -backward_drift), forward_drift + 1):
+        d = (drift + i) * period
+        if totp(key, format=format, period=period, hash=hash, t=t + d) == str(response):
+            return True, drift + i
     return False, 0
